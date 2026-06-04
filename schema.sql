@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS pages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  url TEXT NOT NULL,
+  title TEXT,
+  timestamp INTEGER NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_pages_timestamp ON pages(timestamp DESC);
+
+CREATE INDEX IF NOT EXISTS idx_pages_url ON pages(url);

@@ -1,0 +1,176 @@
+/*
+  josh's custom css reset
+  https://www.joshwcomeau.com/css/custom-css-reset/
+*/
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+*:not(dialog) {
+    margin: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        interpolate-size: allow-keywords;
+    }
+}
+
+body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    overflow-wrap: break-word;
+}
+
+p {
+    text-wrap: pretty;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 1.3;
+    text-wrap: balance;
+    color: var(--color-gray-900);
+}
+
+#app {
+    isolation: isolate;
+}
+
+html,
+body,
+#app {
+    height: 100%;
+}
+
+:root {
+    --color-gray-50: #ffffff;
+    --color-gray-75: #fdfdfd;
+    --color-gray-100: #f8f8f8;
+    --color-gray-200: #e6e6e6;
+    --color-gray-300: #d5d5d5;
+    --color-gray-400: #b1b1b1;
+    --color-gray-500: #909090;
+    --color-gray-600: #6d6d6d;
+    --color-gray-700: #464646;
+    --color-gray-800: #222222;
+    --color-gray-900: #000000;
+
+    --color-seafoam-100: #cef7f3;
+    --color-seafoam-200: #aaf1ea;
+    --color-seafoam-300: #8ce9e2;
+    --color-seafoam-400: #65dad2;
+    --color-seafoam-500: #3fc9c1;
+    --color-seafoam-600: #0fb5ae;
+    --color-seafoam-700: #008c87;
+    --color-seafoam-800: #008c87;
+    --color-seafoam-900: #007772;
+    --color-seafoam-1000: #00635f;
+    --color-seafoam-1100: #0c4f4c;
+    --color-seafoam-1200: #123c3a;
+    --color-seafoam-1300: #122c2b;
+
+    --color-blue-100: #e0f2ff;
+    --color-blue-200: #cae8ff;
+    --color-blue-300: #b5deff;
+    --color-blue-400: #96cefd;
+    --color-blue-500: #78bbfa;
+    --color-blue-600: #59a7f6;
+    --color-blue-700: #3892f3;
+    --color-blue-800: #147af3;
+    --color-blue-900: #0265dc;
+    --color-blue-1000: #0054b6;
+    --color-blue-1100: #004491;
+    --color-blue-1200: #003571;
+    --color-blue-1300: #002754;
+
+    --color-green-100: #cef8e0;
+    --color-green-200: #adf4ce;
+    --color-green-300: #89ecbc;
+    --color-green-400: #67dea8;
+    --color-green-500: #49cc93;
+    --color-green-600: #2fb880;
+    --color-green-700: #15a46e;
+    --color-green-800: #008f5d;
+    --color-green-900: #007a4d;
+    --color-green-1000: #00653e;
+    --color-green-1100: #005132;
+    --color-green-1200: #053f27;
+    --color-green-1300: #0a2e1d;
+
+    --color-red-100: #ffebe7;
+    --color-red-200: #ffddd6;
+    --color-red-300: #ffcdc3;
+    --color-red-400: #ffb7a9;
+    --color-red-500: #ff9b88;
+    --color-red-600: #ff7c65;
+    --color-red-700: #f75c46;
+    --color-red-800: #ea3829;
+    --color-red-900: #d31510;
+    --color-red-1000: #b40000;
+    --color-red-1100: #930000;
+    --color-red-1200: #740000;
+    --color-red-1300: #590000;
+
+    --font-size-50: calc(11rem / 16);
+    --font-size-75: calc(12rem / 16);
+    --font-size-100: calc(14rem / 16);
+    --font-size-200: calc(16rem / 16);
+    --font-size-300: calc(18rem / 16);
+    --font-size-400: calc(20rem / 16);
+    --font-size-500: calc(22rem / 16);
+    --font-size-600: calc(25rem / 16);
+    --font-size-700: calc(28rem / 16);
+    --font-size-800: calc(32rem / 16);
+    --font-size-900: calc(36rem / 16);
+    --font-size-1000: calc(40rem / 16);
+    --font-size-1100: calc(45rem / 16);
+    --font-size-1200: calc(50rem / 16);
+    --font-size-1300: calc(60rem / 16);
+
+    --ease-out: cubic-bezier(0, 0, 0.4, 1);
+    --ease-in: cubic-bezier(0.5, 0, 1, 1);
+    --ease-in-out: cubic-bezier(0.45, 0, 0.4, 1);
+
+    --duration-100: 130ms;
+    --duration-200: 160ms;
+    --duration-300: 190ms;
+    --duration-400: 220ms;
+    --duration-500: 250ms;
+}
+
+body {
+    background-color: var(--color-gray-50);
+    font-size: var(--font-size-100);
+}
