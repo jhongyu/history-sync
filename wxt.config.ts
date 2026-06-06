@@ -8,5 +8,13 @@ export default defineConfig({
     version: "0.0.1",
     permissions: ["webNavigation", "tabs", "storage"],
     host_permissions: ["https://api.cloudflare.com/*"],
+    browser_specific_settings: {
+      gecko: {
+        id: "@history-sync",
+        data_collection_permissions: {
+          required: ["none"],
+        },
+      },
+    },
   },
 });
