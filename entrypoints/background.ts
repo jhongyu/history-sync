@@ -1,4 +1,4 @@
-import { getCloudflareService, type PageRecord } from "@/utils/cloudflare";
+import { getHistoryApiService, type PageRecord } from "@/utils/cloudflare";
 
 const RECENT_RECORD_TTL = 10_000;
 const recentRecords = new Map<string, number>();
@@ -51,7 +51,7 @@ export default defineBackground(() => {
         };
 
         try {
-          const service = await getCloudflareService();
+          const service = await getHistoryApiService();
           await service.insertRecord(pageRecord);
           console.log("Record saved to Cloudflare D1:", pageRecord);
         } catch (error) {

@@ -7,7 +7,7 @@ export default defineConfig({
     name: "History Sync",
     version: "0.0.1",
     permissions: ["webNavigation", "tabs", "storage"],
-    host_permissions: ["https://api.cloudflare.com/*"],
+    host_permissions: ["https://history-sync-api.jhy.workers.dev/*"],
     browser_specific_settings: {
       gecko: {
         id: "@history-sync",

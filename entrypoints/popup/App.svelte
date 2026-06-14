@@ -1,28 +1,24 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { getCloudflareService, type PageRecord } from "@/utils/cloudflare";
-    import { CloudSync } from "@lucide/svelte";
+    import { getHistoryApiService, type PageRecord } from "@/utils/cloudflare";
 
     let records = $state<PageRecord[]>([]);
     let loading = $state(false);
     let error = $state<string | null>(null);
 
     let config = $state({
-        apiToken: "",
-        accountId: "",
-        databaseId: "",
+        apiBaseUrl: "",
+        bearerToken: "",
     });
 
-    let hasConfig = $derived(
-        config.apiToken && config.accountId && config.databaseId,
-    );
+    let hasConfig = $derived(config.apiBaseUrl && config.bearerToken);
 
     async function fetchRecords() {
         loading = true;
         error = null;
 
         try {
-            const service = await getCloudflareService();
+            const service = await getHistoryApiService();
             records = await service.getAllRecords();
         } catch (err) {
             error =
@@ -35,16 +31,17 @@
 
     async function loadConfig() {
         try {
-            const stored = (await browser.storage.local.get([
-                "CLOUDFLARE_API_TOKEN",
-                "CLOUDFLARE_ACCOUNT_ID",
-                "CLOUDFLARE_DATABASE_ID",
+            let stored = (await browser.storage.local.get([
+                "HISTORY_API_BASE_URL",
+                "HISTORY_API_BEARER_TOKEN",
             ])) as Record<string, string>;
 
-            if (stored.CLOUDFLARE_API_TOKEN) {
-                config.apiToken = stored.CLOUDFLARE_API_TOKEN;
-                config.accountId = stored.CLOUDFLARE_ACCOUNT_ID;
-                config.databaseId = stored.CLOUDFLARE_DATABASE_ID;
+            if (
+                stored.HISTORY_API_BASE_URL &&
+                stored.HISTORY_API_BEARER_TOKEN
+            ) {
+                config.apiBaseUrl = stored.HISTORY_API_BASE_URL;
+                config.bearerToken = stored.HISTORY_API_BEARER_TOKEN;
             }
         } catch (err) {
             console.error("Error loading config:", err);
@@ -78,7 +75,7 @@
         <section class="no-records" aria-labelledby="config-required-title">
             <h2 id="config-required-title">Configuration required</h2>
             <p>
-                Cloudflare D1 credentials are not configured. Please open the
+                History API configuration are not configured. Please open the
                 options page to configure them.
             </p>
             <button

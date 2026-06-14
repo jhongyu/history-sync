@@ -3,110 +3,84 @@ export interface PageRecord {
   url: string;
   title: string;
   timestamp: number;
+  created_at?: string;
 }
 
-class CloudflareD1Service {
-  private apiToken: string;
-  private accountId: string;
-  private databaseId: string;
-  private baseUrl: string;
+class HistoryApiService {
+  private apiBaseUrl: string;
+  private bearerToken: string;
 
-  constructor(apiToken: string, accountId: string, databaseId: string) {
-    this.apiToken = apiToken;
-    this.accountId = accountId;
-    this.databaseId = databaseId;
-    this.baseUrl = `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}`;
+  constructor(apiBaseUrl: string, bearerToken: string) {
+    this.apiBaseUrl = apiBaseUrl.replace(/\/$/, "");
+    this.bearerToken = bearerToken;
+  }
+
+  private async request<T = unknown>(path: string, init: RequestInit = {}) {
+    const response = await fetch(`${this.apiBaseUrl}${path}`, {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${this.bearerToken}`,
+        "Content-Type": "application/json",
+        ...init.headers,
+      },
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`History API error: ${response.status}: ${errorBody}`);
+    }
+
+    return response.json() as Promise<T>;
   }
 
   async insertRecord(record: PageRecord): Promise<void> {
-    const sql = `
-      INSERT INTO pages (url, title, timestamp)
-      VALUES (?, ?, ?)
-    `;
-
-    await this.executeQuery(sql, [record.url, record.title, record.timestamp]);
+    await this.request("/record", {
+      method: "POST",
+      body: JSON.stringify(record),
+    });
   }
 
-  async getAllRecords(limit: number = 100): Promise<PageRecord[]> {
-    const sql = `
-      SELECT id, url, title, timestamp FROM pages
-      ORDER BY timestamp DESC
-      LIMIT ?
-    `;
+  async getAllRecords(
+    limit: number = 100,
+    offset: number = 0,
+  ): Promise<PageRecord[]> {
+    const data = await this.request<{
+      success: boolean;
+      data: {
+        items: PageRecord[];
+        pagination: {
+          limit: number;
+          offset: number;
+          totle?: number;
+          count: number;
+        };
+      };
+    }>(`/records?limit=${limit}&offset=${offset}`);
 
-    const response = await this.executeQuery(sql, [limit]);
-    return response.results || [];
-  }
-
-  async cleanupOldRecords(keepCount: number = 100): Promise<void> {
-    const sql = `
-      DELETE FROM pages WHERE id NOT IN (
-        SELECT id FROM pages ORDER BY timestamp DESC LIMIT ?
-      )
-    `;
-
-    await this.executeQuery(sql, [keepCount]);
-  }
-
-  private async executeQuery(sql: string, params?: any[]): Promise<any> {
-    try {
-      const response = await fetch(`${this.baseUrl}/query`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${this.apiToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sql,
-          params,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(
-          `Cloudflare API error: ${response.status}: ${errorBody}`,
-        );
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        return data.result?.[0];
-      } else {
-        throw new Error(
-          `Query failed: ${data.errors?.[0]?.message || "Unknown error"}`,
-        );
-      }
-    } catch (error) {
-      console.error("Cloudflare D1 error:", error);
-      throw error;
+    if (data.success) {
+      return data.data.items;
     }
+
+    return [];
   }
 }
 
-export async function getCloudflareService(): Promise<CloudflareD1Service> {
+export async function getHistoryApiService(): Promise<HistoryApiService> {
   const stored = (await browser.storage.local.get([
-    "CLOUDFLARE_API_TOKEN",
-    "CLOUDFLARE_ACCOUNT_ID",
-    "CLOUDFLARE_DATABASE_ID",
+    "HISTORY_API_BASE_URL",
+    "HISTORY_API_BEARER_TOKEN",
   ])) as Record<string, string>;
 
-  if (
-    !stored.CLOUDFLARE_API_TOKEN ||
-    !stored.CLOUDFLARE_ACCOUNT_ID ||
-    !stored.CLOUDFLARE_DATABASE_ID
-  ) {
+  if (!stored.HISTORY_API_BASE_URL || !stored.HISTORY_API_BEARER_TOKEN) {
     throw new Error(
-      "Cloudflare configuration not found. Please set API credentials in extension settings.",
+      "History API configuration not found. Please set API URL and bearer token in extension settings.",
     );
   }
 
-  return new CloudflareD1Service(
-    stored.CLOUDFLARE_API_TOKEN,
-    stored.CLOUDFLARE_ACCOUNT_ID,
-    stored.CLOUDFLARE_DATABASE_ID,
+  return new HistoryApiService(
+    stored.HISTORY_API_BASE_URL,
+    stored.HISTORY_API_BEARER_TOKEN,
   );
 }
 
-export default CloudflareD1Service;
+export default HistoryApiService;

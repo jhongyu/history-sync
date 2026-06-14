@@ -8,9 +8,8 @@
     let showApiToken = $state(false);
 
     let config = $state({
-        apiToken: "",
-        accountId: "",
-        databaseId: "",
+        apiBaseUrl: "",
+        bearerToken: "",
     });
 
     function showSuccessMessage(message: string) {
@@ -25,16 +24,15 @@
 
     async function saveConfig(e: SubmitEvent) {
         e.preventDefault();
-        if (!config.apiToken || !config.accountId || !config.databaseId) {
+        if (!config.apiBaseUrl || !config.bearerToken) {
             error = "Please fill in all configuration fields";
             return;
         }
 
         try {
             await browser.storage.local.set({
-                CLOUDFLARE_API_TOKEN: config.apiToken.trim(),
-                CLOUDFLARE_ACCOUNT_ID: config.accountId.trim(),
-                CLOUDFLARE_DATABASE_ID: config.databaseId.trim(),
+                HISTORY_API_BASE_URL: config.apiBaseUrl.trim(),
+                HISTORY_API_BEARER_TOKEN: config.bearerToken.trim(),
             });
 
             error = null;
@@ -49,15 +47,16 @@
     async function loadConfig() {
         try {
             let stored = (await browser.storage.local.get([
-                "CLOUDFLARE_API_TOKEN",
-                "CLOUDFLARE_ACCOUNT_ID",
-                "CLOUDFLARE_DATABASE_ID",
+                "HISTORY_API_BASE_URL",
+                "HISTORY_API_BEARER_TOKEN",
             ])) as Record<string, string>;
 
-            if (stored.CLOUDFLARE_API_TOKEN) {
-                config.apiToken = stored.CLOUDFLARE_API_TOKEN;
-                config.accountId = stored.CLOUDFLARE_ACCOUNT_ID;
-                config.databaseId = stored.CLOUDFLARE_DATABASE_ID;
+            if (
+                stored.HISTORY_API_BASE_URL &&
+                stored.HISTORY_API_BEARER_TOKEN
+            ) {
+                config.apiBaseUrl = stored.HISTORY_API_BASE_URL;
+                config.bearerToken = stored.HISTORY_API_BEARER_TOKEN;
             }
         } catch (err) {
             console.error("Error loading config:", err);
@@ -83,20 +82,36 @@
               : undefined}
         aria-labelledby="config-title"
     >
-        <h2 id="config-title">Cloudflare D1 Configuration</h2>
+        <h2 id="config-title">History API Configuration</h2>
 
         <div class="form-group">
-            <label for="token"
-                >API Token <span aria-hidden="true">*</span></label
+            <label for="apiBaseUrl"
+                >API Base URL<span aria-hidden="true">*</span></label
+            >
+            <input
+                name="apiBaseUrl"
+                id="apiBaseUrl"
+                bind:value={config.apiBaseUrl}
+                type="text"
+                placeholder="https://example.com"
+                required
+                autocomplete="off"
+                spellcheck="false"
+            />
+        </div>
+
+        <div class="form-group">
+            <label for="bearerToken"
+                >Bearer Token <span aria-hidden="true">*</span></label
             >
             <div class="token-input" data-visible={showApiToken}>
                 <input
-                    name="token"
-                    id="token"
+                    name="bearerToken"
+                    id="bearerToken"
                     class="token-input-field"
-                    bind:value={config.apiToken}
+                    bind:value={config.bearerToken}
                     type={showApiToken ? "text" : "password"}
-                    placeholder="Your Cloudflare API Token"
+                    placeholder="Your API Bearer Token"
                     required
                     autocomplete="off"
                     spellcheck="false"
@@ -117,38 +132,6 @@
                     </span>
                 </button>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label for="accountId"
-                >Account ID <span aria-hidden="true">*</span></label
-            >
-            <input
-                name="accountId"
-                id="accountId"
-                bind:value={config.accountId}
-                type="text"
-                placeholder="Your Cloudflare Account ID"
-                required
-                autocomplete="off"
-                spellcheck="false"
-            />
-        </div>
-
-        <div class="form-group">
-            <label for="databaseId"
-                >Database ID <span aria-hidden="true">*</span></label
-            >
-            <input
-                name="databaseId"
-                id="databaseId"
-                bind:value={config.databaseId}
-                type="text"
-                placeholder="Your D1 Database ID"
-                required
-                autocomplete="off"
-                spellcheck="false"
-            />
         </div>
 
         <button class="submit-btn" type="submit">Save Configuration</button>
